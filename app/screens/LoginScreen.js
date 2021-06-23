@@ -4,6 +4,9 @@ import { Button, TextInput } from "react-native-paper";
 import Constants from "expo-constants";
 import colors from "res/colors";
 import { init, IMLocalized } from "config/IMLocalized";
+import {login} from 'services/auth.service';
+import {setCredentials} from 'services/credentials';
+
 export const LoginScreen = ({ navigation }) => {
   init();
   const [email, setEmail] = useState("");
@@ -13,7 +16,16 @@ export const LoginScreen = ({ navigation }) => {
   const [hidePassword, sethidePassword] = React.useState(true);
   const formSubmited = () => {
     setInvalidCredentials(!isFormValid());
+    isFormValid && signIn(email,password);
   };
+  const signIn=(email,pass)=>{
+  login(email,pass)
+  .then(({data})=>{
+    console.log("SignIn Success",data);
+    setCredentials(data);
+  })
+  .catch((err)=>{console.log("SignIn Error... ")});
+  }
   const isFormValid = () => {
     if (password.length < 8 || email.length === 0) {
       return false;

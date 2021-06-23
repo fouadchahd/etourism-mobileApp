@@ -10,6 +10,7 @@ import { Button, TextInput } from "react-native-paper";
 import Constants from "expo-constants";
 import colors from "res/colors";
 import { init, IMLocalized } from "config/IMLocalized";
+import { registerUser } from "services/auth.service";
 export const RegisterScreen = ({ navigation }) => {
   init();
   const [email, setEmail] = useState("");
@@ -22,6 +23,12 @@ export const RegisterScreen = ({ navigation }) => {
   const [hidePassword, sethidePassword] = React.useState(true);
   const [passwordError, setPasswordError] = useState([]);
   const [enabledKB, setenabledKB] = useState(false);
+  const [errors, setErrors] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+  });
+  const [isLoading, setIsLoading] = useState(false);
   const checkPassword = (pwd) => {
     setPasswordError([]);
     if (pwd.length < 8) {
@@ -42,6 +49,33 @@ export const RegisterScreen = ({ navigation }) => {
   const focusOnElement = (ref) => {
     ref && ref.current && ref.current.focus();
   };
+  const cleardata = () => {
+    setEmail("");
+    setFirstName("");
+    setLastName("");
+    setPassword("");
+    setErrors("");
+    setPasswordError("");
+  };
+  const signUpButtonPressed = async () => {
+    setIsLoading(true);
+    //check field
+    //post the data
+
+    console.log("start with " + firstName.trim() + "" + lastName);
+    registerUser(firstName.trim(), lastName.trim(), email, password)
+      .then(({ data }) => {
+        console.log("data", data);
+        setIsLoading(false);
+        cleardata();
+        return data;
+      })
+      .catch((err) => {
+        console.log("err", err);
+        setIsLoading(false);
+      });
+  };
+
   const theme = {
     colors: {
       placeholder: colors.placeholderTextColor,
@@ -170,14 +204,16 @@ export const RegisterScreen = ({ navigation }) => {
             </View>
             <View style={[styles.inputGroup, { marginTop: 30 }]}>
               <Button
-                onPress={() => alert("pressed")}
+                loading={isLoading}
+                disabled={isLoading}
+                onPress={signUpButtonPressed}
                 mode="contained"
                 uppercase={false}
                 color={colors.buttonBackGroundPrimaryColor}
                 contentStyle={{ height: 54 }}
               >
                 <Text style={styles.primaryButtonText}>
-                  {IMLocalized("signUpButtonText")}
+                  {!isLoading && IMLocalized("signUpButtonText")}
                 </Text>
               </Button>
             </View>

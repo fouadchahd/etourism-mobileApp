@@ -9,7 +9,7 @@ const AppNavigationContainer = () => {
   console.log("authToken is", authToken);
   return (
     <NavigationContainer>
-      {authToken ? <RootStackScreen /> : <RootStackScreen />}
+      {!authToken ? <RootStackScreen /> : <RootDrawerScreen />}
     </NavigationContainer>
   );
 };

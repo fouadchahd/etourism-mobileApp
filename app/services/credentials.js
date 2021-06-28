@@ -5,9 +5,17 @@ import service_env from "./__env.service";
 var jwt_decode = require('jwt-decode');
 const API_URL = service_env.API_URL;
 
+export const deleteCredentials= async function(){
+  try {
+     await SecureStore.deleteItemAsync('jwt_auth');
+    return true;
+  } catch (e) {
+    console.log(e);
+    return false;
+  }
+}
 
-
-const setCredentials = async jwt_auth => {
+export const setCredentials = async function(jwt_auth){
     try {
       await SecureStore.setItemAsync('jwt_auth', JSON.stringify(jwt_auth));
       return true;
@@ -17,10 +25,9 @@ const setCredentials = async jwt_auth => {
     }
   }
   
-const getCredentials = async () => {
+export const getCredentials = async () => {
     try {
         let credentials = await SecureStore.getItemAsync('jwt_auth')
-    
         let cred =  getVerifiedKeys(JSON.parse(credentials))
     
         if (credentials != null && cred != null) {
@@ -61,7 +68,6 @@ if (keys) {
         return new_jwt_auth;
     } else {
         console.log('refresh expired, please login')
-
         return null
     }
     }

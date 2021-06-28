@@ -3,6 +3,7 @@ import service_env from "./__env.service";
 const API_URL = service_env.API_URL;
 const headers = service_env.JSON_HEADER;
 import * as SecureStore from 'expo-secure-store';
+import {getCredentials} from './credentials';
 
 async function setValue(key, value) {
   try {
@@ -22,7 +23,7 @@ async function getValue(key) {
   }
 }
 
-export const registerUser = async function(firstName,lastName, email, password){
+export const registerUser = async function(firstName,lastName, email, password,gender){
   return axios.post(API_URL + "tourists", {
     firstName,
     lastName,
@@ -30,7 +31,8 @@ export const registerUser = async function(firstName,lastName, email, password){
     "roles": [
       "ROLE_USER"
     ],
-    password
+    password,
+    gender
   },headers);
 };
 export const login = async function(username, password) {
@@ -42,8 +44,17 @@ export const login = async function(username, password) {
   }
 
 export const logout = async() => {
-//remove user_auth from secureStorage
+//remove user_auth from secureStorage and his refresh_token from db
 try {
+  axios.interceptors.request.use( async (config) => {
+    const userJWT = await getCredentials();
+    if(userJWT && userJWT.token){
+      const token = 'Bearer ' + userJWT.token;
+      config.headers.Authorization =  token;
+    }
+    return config;
+  });
+  await axios.post(API_URL+"logout",{},headers);
   await SecureStore.deleteItemAsync("jwt_auth");
 } catch (error) {
   console.log("error",error)
@@ -53,5 +64,4 @@ export const updateCurrentUserInSecureStorage = (new_user_data)=>{
     //update the secureStorage with the new user_data
     setValue("jwt_auth",new_user_data);
 }
-
 

@@ -11,7 +11,12 @@ import Constants from "expo-constants";
 import colors from "res/colors";
 import { init, IMLocalized } from "config/IMLocalized";
 import { registerUser } from "services/auth.service";
-export const RegisterScreen = ({ navigation }) => {
+import * as SecureStore from "expo-secure-store";
+
+import Toast from "react-native-toast-message";
+import { login } from "../services/auth.service";
+
+export const RegisterScreen = ({ navigation,route }) => {
   init();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -28,6 +33,19 @@ export const RegisterScreen = ({ navigation }) => {
     lastName: "",
     email: "",
   });
+  React.useEffect(() => {
+    async function getcrdt() {
+      try {
+        const jwt = await SecureStore.getItemAsync("jwt_auth");
+        if (jwt) {
+          console.log("datat stored", jwt);
+        }
+      } catch (e) {
+        console.log("error while fetching secure store");
+      }
+    }
+    getcrdt();
+  }, []);
   const [isLoading, setIsLoading] = useState(false);
   const checkPassword = (pwd) => {
     setPasswordError([]);
@@ -61,19 +79,54 @@ export const RegisterScreen = ({ navigation }) => {
     setIsLoading(true);
     //check field
     //post the data
-
-    console.log("start with " + firstName.trim() + "" + lastName);
-    registerUser(firstName.trim(), lastName.trim(), email, password)
-      .then(({ data }) => {
-        console.log("data", data);
-        setIsLoading(false);
-        cleardata();
-        return data;
-      })
-      .catch((err) => {
-        console.log("err", err);
-        setIsLoading(false);
+    if (
+      email.length === 0 &&
+      password.length === 0 &&
+      firstName.length === 0 &&
+      lastName.length === 0
+    ) {
+      setIsLoading(false);
+      Toast.show({
+        type: "error",
+        position: "bottom",
+        text2: "",
+        text1: IMLocalized("fillAllFieldErrorMessage"),
+        visibilityTime: 3000,
+        autoHide: true,
+        bottomOffset: 40,
       });
+    } else {
+      let gender=route.params.gender;
+      registerUser(firstName.trim(), lastName.trim(), email, password,gender)
+        .then(({ data }) => {
+          setIsLoading(false);
+          Toast.show({
+            type: "success",
+            position: "bottom",
+            text2: "",
+            text1: IMLocalized("validRegisteringMessage"),
+            visibilityTime: 4000,
+            autoHide: true,
+            bottomOffset: 40,
+          });
+        }).then(()=>{
+            navigation.navigate("LoginScreen",{email});
+            //cleardata();
+        })
+        .catch((err) => {
+          console.log("err", err);
+          setIsLoading(false);
+          Toast.show({
+            type: "error",
+            position: "bottom",
+            text2: "",
+            text1: IMLocalized("invalidRegisteringMessage"),
+            visibilityTime: 3000,
+            autoHide: true,
+            bottomOffset: 40,
+          });
+        });
+    }
   };
 
   const theme = {
@@ -213,7 +266,9 @@ export const RegisterScreen = ({ navigation }) => {
                 contentStyle={{ height: 54 }}
               >
                 <Text style={styles.primaryButtonText}>
-                  {!isLoading && IMLocalized("signUpButtonText")}
+                  {isLoading
+                    ? IMLocalized("signUpButtonLoaderText")
+                    : IMLocalized("signUpButtonText")}
                 </Text>
               </Button>
             </View>

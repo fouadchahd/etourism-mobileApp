@@ -5,12 +5,15 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [authToken, setAuthToken] = useState(null);
   useEffect(() => {
-    try {
-      const jwt_auth = SecureStore.getItemAsync("jwt_auth");
-      if (jwt_auth) setAuthToken(jwt_auth);
-    } catch (error) {
-      console.log("Error while fetching jwt_auth from secureStore", error);
+    async function getcrd() {
+      try {
+        const jwt_auth = await SecureStore.getItemAsync("jwt_auth");
+        if (jwt_auth) setAuthToken(jwt_auth);
+      } catch (error) {
+        console.log("Error while fetching jwt_auth from secureStore", error);
+      }
     }
+    getcrd();
   }, []);
 
   return (

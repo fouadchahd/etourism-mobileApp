@@ -9,17 +9,42 @@
     "bigLorem":"Vestibulum ultricies tempus augue ardum,Nunc vehicula cursus justo non tincidunt. Donec vehicula tellus at nunc dignissim dapibus. Quisque sem leo, mollis a placerat sit amet, tempor ac quam. Aliquam eu feugiat nisi, id tincidunt justo..",
     "noAccountText":"Didn't have any account yet? ",
 "alreadyHaveAccount":"Already have an account ?",
-"signInHere":" Sign in here",
-    "signUpHere":" Sign up here ",
-    "signInButtonText":"Sign in",
-    "signUpButtonText":"Sign up",
+"signInHere":" Sign-in here",
+    "signUpHere":" Sign-up here ",
+    "signInButtonText":"Sign-in",
+    "signUpButtonText":"Sign-up",
     "firstNameLabel":"First Name",
     "lastNameLabel":"Last Name",
     "emailLabel":"Email address",
     "passwordLabel":"Password",
     "passwordLengthError":"too short (at least 8 characters)",
    "registerForFreeInText": "Register For Free In",
+   "registerForFreeInText2": "",
    "welcomeText":"Welcome 👋",
    "next":"next",
    "invalidCredentialsErrorText":"⚠️ Please be sure you are using the correct email address and password combination"
+,"signInButtonLoaderText":"Authentication..."
+,"signUpButtonLoaderText":"Registering..."
+,"invalidCredentialsMessage":"Invalid Credentials, Retry again"
+,"invalidRegisteringMessage":"Sorry, something went wrong"
+,"validRegisteringMessage":"Good news, you have create your account "
+,"validRegisteringSubMessage":"Sign-in to enjoy the moroccan culture🇲🇦 "
+,"fillAllFieldErrorMessage":"Fill Out All Fields "
+,"genderMale":"Male"
+,"genderFemale":"Female"
+,"continue":"Continue",
+"drawerEditProfileLabel":"Edit rofile",
+"drawerSettingsLabel":"Settings",
+"drawerSupportLabel":"Support",
+"drawerNotificationsLabel":"Notifications",
+"drawerHelpLabel":"Help",
+"drawerLogoutLabel":"Logout",
+"drawerHomeLabel":"Home",
+"defaultBio":"Hi there 👋! I'm using MaPocket.",
+"skip":"Skip",
+"editProfileHeaderTitle1":"First you'll need",
+"editProfileHeaderTitle2":"to pick a picture 🖼️",
+"tapBellow":"Tap 👇 To replace picture",
+"accessDenied":"Sorry, we need camera roll permissions to make this work!",
+"nicePicture":"😍 Nice picture 😍"
 }

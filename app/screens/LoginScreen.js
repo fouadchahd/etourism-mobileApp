@@ -1,31 +1,65 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef,useContext } from "react";
 import { View, ScrollView, Text, StyleSheet } from "react-native";
 import { Button, TextInput } from "react-native-paper";
+import Toast from 'react-native-toast-message';
 import Constants from "expo-constants";
 import colors from "res/colors";
 import { init, IMLocalized } from "config/IMLocalized";
 import {login} from 'services/auth.service';
 import {setCredentials} from 'services/credentials';
-
-export const LoginScreen = ({ navigation }) => {
+import AuthContext from "../contexts/AuthContext";
+export const LoginScreen = ({ navigation ,route}) => {
   init();
-  const [email, setEmail] = useState("");
+  let init_email="";
+  if(route&&route.params&&route.params.email ){
+    init_email=route.params.email;
+  }
+  const { authToken, setAuthToken}=useContext(AuthContext);
+  const [email, setEmail] = useState(init_email);
   const [password, setPassword] = useState("");
   const passwordRef = useRef();
   const [invalidCredentials, setInvalidCredentials] = useState(false);
   const [hidePassword, sethidePassword] = React.useState(true);
+  const [isLoading, setisLoading] = useState(false)
   const formSubmited = () => {
+    
     setInvalidCredentials(!isFormValid());
-    isFormValid && signIn(email,password);
+    isFormValid() && signIn(email,password);
   };
-  const signIn=(email,pass)=>{
-  login(email,pass)
+  const signIn= async (mail,pass)=>{
+    setisLoading(true);
+  await login(mail,pass)
   .then(({data})=>{
+    setisLoading(false);
     console.log("SignIn Success",data);
+    Toast.show({
+      type:"success",
+      position:"bottom",
+      visibilityTime: 4000,
+      autoHide:true,
+      bottomOffset:40,
+      text1: IMLocalized("Welcome")+" "+data.data.firstName,
+      text2: ''
+    });
     setCredentials(data);
+    setAuthToken(data);
   })
-  .catch((err)=>{console.log("SignIn Error... ")});
+  .catch((err)=>{
+    //flush error message 
+    setisLoading(false);
+    Toast.show({
+      type:"error",
+      position:"bottom",
+      visibilityTime: 3000,
+      autoHide:true,
+      bottomOffset:40,
+      text1: IMLocalized("invalidCredentialsMessage"),
+      text2: ''
+    });
+    console.log("SignIn Error... ")});
+
   }
+
   const isFormValid = () => {
     if (password.length < 8 || email.length === 0) {
       return false;
@@ -118,7 +152,7 @@ export const LoginScreen = ({ navigation }) => {
                 <TextInput.Icon
                   onPress={toggleHidePassword}
                   name={hidePassword ? "eye-off" : "eye"}
-                  color={colors.inputOutlineColor}
+                  color={colors.buttonPrimaryTextColor}
                 />
               }
             />
@@ -130,12 +164,14 @@ export const LoginScreen = ({ navigation }) => {
             <Button
               onPress={formSubmited}
               mode="contained"
+              loading={isLoading}
+              disabled={isLoading}
               uppercase={false}
               color={colors.buttonBackGroundPrimaryColor}
               contentStyle={{ height: 54 }}
             >
               <Text style={styles.primaryButtonText}>
-                {IMLocalized("signInButtonText")}
+                {isLoading?IMLocalized("signInButtonLoaderText"): IMLocalized("signInButtonText")}
               </Text>
             </Button>
           </View>
@@ -143,7 +179,7 @@ export const LoginScreen = ({ navigation }) => {
             <Text style={styles.smallCentredText}>
               {IMLocalized("noAccountText")}
               <Text
-                onPress={() => navigation.navigate("RegisterScreen")}
+                onPress={() => navigation.navigate("GenderChoiceScreen")}
                 style={{ fontWeight: "bold", color: "#343a40" }}
               >
                 {IMLocalized("signUpHere")}

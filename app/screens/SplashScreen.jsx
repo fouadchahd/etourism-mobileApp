@@ -20,7 +20,7 @@ const SplashScreen = ({ navigation }) => {
   const { colors } = useTheme();
 
   return (
-    <View style={styles.container}>
+    <LinearGradient style={styles.container} colors={["#99d98c", "#52b69a"]}>
       <StatusBar backgroundColor="#009387" barStyle="dark-content" />
       <View style={styles.header}>
         <Animatable.Image
@@ -70,7 +70,7 @@ const SplashScreen = ({ navigation }) => {
           </TouchableOpacity>
         </View>
       </Animatable.View>
-    </View>
+    </LinearGradient>
   );
 };
 

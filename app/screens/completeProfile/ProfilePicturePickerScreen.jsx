@@ -7,8 +7,6 @@ import colors from "res/colors";
 import { LinearGradient } from "expo-linear-gradient";
 import { TouchableWithoutFeedback } from "react-native-gesture-handler";
 import * as ImagePicker from "expo-image-picker";
-import { storage } from "../../firebase";
-
 const ProfilePicturePickerScreen = ({ navigation, route }) => {
   let gender = null;
   gender = route.params ? route.params.gender : null;
@@ -33,7 +31,7 @@ const ProfilePicturePickerScreen = ({ navigation, route }) => {
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [4, 3],
-      quality: 1,
+      quality: 0.4,
     });
     console.log(result);
 
@@ -41,47 +39,28 @@ const ProfilePicturePickerScreen = ({ navigation, route }) => {
       setPictureFile(result);
     }
   };
-  const uploadSinglePicture = async (picture) => {
-    if (picture) {
-      var now = new Date();
-      const res = await fetch(picture.uri);
-      const blob = await res.blob();
-      const uploadTask = storage
-        .ref(`profilePhotos/user_${now.getTime()}`)
-        .put(blob);
-      uploadTask.on(
-        "state_changed",
-        (snapshot) => {
-          const progress = Math.round(
-            (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-          );
-          console.log("image progress " + progress);
-        },
-        (error) => {
-          console.log("error() " + error);
-        },
-        () => {
-          storage
-            .ref("profilePhotos")
-            .child(`user_${now.getTime()}`)
-            .getDownloadURL()
-            .then((url) => {
-              console.log("image url", url);
-            });
-        }
-      );
+
+  const nextClicked = () => {
+    if (pictureFile && pictureFile.uri) {
+      navigation.navigate("NationalityPickerScreen", {
+        profilePicture: pictureFile,
+        gender,
+      });
     }
   };
-  const nextClicked = () => {
-    console.log("START");
-    if (pictureFile && pictureFile.uri) {
-      uploadSinglePicture(pictureFile);
-    }
+  const stepSkipped = () => {
+    console.log("Picture Profile Step Was Skipped");
+    navigation.navigate("NationalityPickerScreen", {
+      profilePicture: null,
+      gender,
+    });
   };
   return (
     <View style={styles.screen}>
       <View style={styles.header}>
-        <Text style={styles.headerText}>{IMLocalized("skip")}</Text>
+        <Text onPress={stepSkipped} style={styles.headerText}>
+          {IMLocalized("skip")}
+        </Text>
       </View>
       <View style={styles.screenTitle}>
         <Text style={styles.screenTitleText}>
@@ -124,7 +103,7 @@ const ProfilePicturePickerScreen = ({ navigation, route }) => {
             width: "90%",
             alignSelf: "center",
             position: "absolute",
-            bottom: 60,
+            bottom: 50,
           }}
         >
           <TouchableWithoutFeedback onPress={nextClicked}>

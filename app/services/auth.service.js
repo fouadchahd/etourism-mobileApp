@@ -23,7 +23,7 @@ async function getValue(key) {
   }
 }
 
-export const registerUser = async function(firstName,lastName, email, password,gender){
+export const registerUser = async function(firstName,lastName, email, password,gender,nationality,profilePicture){
   return axios.post(API_URL + "tourists", {
     firstName,
     lastName,
@@ -32,7 +32,11 @@ export const registerUser = async function(firstName,lastName, email, password,g
       "ROLE_USER"
     ],
     password,
-    gender
+    gender,
+    nationality,
+    "profilePicture":{
+      "url":profilePicture
+    }
   },headers);
 };
 export const login = async function(username, password) {

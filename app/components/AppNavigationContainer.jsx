@@ -6,7 +6,6 @@ import AuthContext from "../contexts/AuthContext";
 
 const AppNavigationContainer = () => {
   const { authToken, setAuthToken } = useContext(AuthContext);
-  console.log("authToken is", authToken);
   return (
     <NavigationContainer>
       {!authToken ? <RootStackScreen /> : <RootDrawerScreen />}

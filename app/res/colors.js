@@ -1,11 +1,18 @@
 const colors = {
     title: '#00B75D',
     white:"#FFF0FF",
+    pureWhite:"#fff",
     green:"#337e53",
     lightGreen:"#C6EEC5",
    lightblue: "#e2eafc90",
+   softGray:"#748c94",
+   black:"#00000F",
+   softBlack:"#161a1d",
    red:"#e63946",
    redOrange:'#fb4d46',
+   skyblue:"#06f",
+   turquoise:"#0fb4ec",
+   facebookColor:"#06f",
     text: '#0C222B',
     button: '#036675',
     inputSelectionColor:"#337e53",
@@ -21,6 +28,7 @@ const colors = {
     greenGradientColorStart:"#99d98c",
     greenGradientColorEnd:"#52b69a",
     errorTextColor:"#e63946",
+    roseRed:"#e32f45",
     greenGradient1:"##78FFD6",
     greenGradient2:"#A8FF78",
     placeholderTextColor:"#ced4da",
@@ -29,7 +37,11 @@ const colors = {
     roseWhite:'#fff0f3',
     grayWhite:"#f1faee",
     darkGreen:"#3c721d",
-    
+    activeTapIconColor:"#3c721d",
+    headerBorderBottomColor:'#748c94',
+    beij:"#fffff9",
+    underlayColor:"#d2d7df",
+    deviderColor:"#d9d9d9"
   }
   
   export default colors;

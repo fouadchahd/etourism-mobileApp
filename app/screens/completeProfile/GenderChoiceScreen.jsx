@@ -74,7 +74,7 @@ const GenderChoiceScreen = ({ navigation }) => {
           </View>
         </TouchableOpacity>
       </Animatable.View>
-      <View style={{ width: "90%", position: "absolute", bottom: 60 }}>
+      <View style={{ width: "90%", position: "absolute", bottom: 50 }}>
         <TouchableWithoutFeedback onPress={nextClicked}>
           <LinearGradient
             style={{

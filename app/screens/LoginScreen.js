@@ -11,11 +11,12 @@ import AuthContext from "../contexts/AuthContext";
 export const LoginScreen = ({ navigation ,route}) => {
   init();
   let init_email="";
-  if(route&&route.params&&route.params.email ){
+  if(route&&route.params&&route.params.email){
+    console.log("email",route.params.email);
     init_email=route.params.email;
   }
   const { authToken, setAuthToken}=useContext(AuthContext);
-  const [email, setEmail] = useState(init_email);
+  const [email, setEmail] = useState(route?.params?.email?route.params.email:"");
   const [password, setPassword] = useState("");
   const passwordRef = useRef();
   const [invalidCredentials, setInvalidCredentials] = useState(false);
@@ -32,15 +33,6 @@ export const LoginScreen = ({ navigation ,route}) => {
   .then(({data})=>{
     setisLoading(false);
     console.log("SignIn Success",data);
-    Toast.show({
-      type:"success",
-      position:"bottom",
-      visibilityTime: 4000,
-      autoHide:true,
-      bottomOffset:40,
-      text1: IMLocalized("Welcome")+" "+data.data.firstName,
-      text2: ''
-    });
     setCredentials(data);
     setAuthToken(data);
   })
@@ -108,6 +100,7 @@ export const LoginScreen = ({ navigation ,route}) => {
               outlineColor={colors.inputOutlineColor}
               theme={theme}
               textContentType="emailAddress"
+              keyboardType={"email-address"}
               spellCheck={true}
               onChangeText={(text) => handleEmailChange(text)}
               onSubmitEditing={() => focusOnElement(passwordRef)}

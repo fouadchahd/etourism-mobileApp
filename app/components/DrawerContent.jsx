@@ -1,5 +1,5 @@
 import React from "react";
-import { View, StyleSheet, Text, Dimensions } from "react-native";
+import { View, StyleSheet, Text, Dimensions, Image } from "react-native";
 import { Avatar, Title, Caption, Paragraph, Drawer } from "react-native-paper";
 import { DrawerContentScrollView, DrawerItem } from "@react-navigation/drawer";
 import Icon from "react-native-vector-icons/Ionicons";
@@ -9,12 +9,12 @@ import { deleteCredentials } from "../services/credentials";
 import colors from "res/colors";
 import { LinearGradient } from "expo-linear-gradient";
 import Constants from "expo-constants";
-import { init, IMLocalized } from "config/IMLocalized";
-import { Colors } from "react-native/Libraries/NewAppScreen";
+import { IMLocalized } from "config/IMLocalized";
 
 export default function DrawerContent(props) {
   const { authToken, setAuthToken } = React.useContext(AuthContext);
-  const userInfo = JSON.parse(authToken).data;
+
+  let userInfo = authToken.data;
   return (
     <View style={{ flex: 1 }}>
       <View backgroundColor="white" style={{ flex: 1 }}>
@@ -22,27 +22,46 @@ export default function DrawerContent(props) {
           <LinearGradient
             style={[
               styles.userInfoSection,
-              { paddingTop: Constants.statusBarHeight },
+              {
+                paddingTop: Constants.statusBarHeight,
+              },
             ]}
             colors={[colors.greenGradientColorStart, colors.greenGradient2]}
+            start={[0, 0]}
+            end={[0, 1]}
           >
-            <View style={{ flexDirection: "row", marginTop: 15 }}>
-              <Avatar.Image
+            <View
+              style={{
+                flexDirection: "row",
+                marginTop: 15,
+                alignItems: "center",
+              }}
+            >
+              <Image
+                defaultSource={require("../assets/person_60px.png")}
                 source={
-                  userInfo.profilePicture
-                    ? { uri: userInfo.profilePicture.url }
-                    : require("../assets/male_user_50px.png")
+                  userInfo?.profilePicture
+                    ? { uri: userInfo.profilePicture }
+                    : require("../assets/person_60px.png")
                 }
-                size={50}
-                style={{ backgroundColor: "transparent" }}
+                style={{
+                  backgroundColor: colors.underlayColor,
+                  height: 50,
+                  width: 50,
+                  borderRadius: 25,
+                  resizeMode: "contain",
+                  alignSelf: "center",
+                }}
               />
               <View style={{ marginLeft: 15, flexDirection: "column" }}>
-                <Title
-                  style={styles.title}
-                >{`${userInfo.firstName} ${userInfo.lastName}`}</Title>
-                <Caption
-                  style={styles.caption}
-                >{`@${userInfo.pseudo}`}</Caption>
+                <Title style={styles.title}>
+                  {!userInfo
+                    ? ""
+                    : `${userInfo.firstName} ${userInfo.lastName}`}
+                </Title>
+                <Caption style={styles.caption}>
+                  {!userInfo ? "" : `@${userInfo.pseudo}`}
+                </Caption>
               </View>
             </View>
 
@@ -146,11 +165,11 @@ const styles = StyleSheet.create({
   },
   userInfoSection: {
     paddingLeft: 20,
-    paddingBottom: 10,
+    paddingBottom: 15,
   },
   title: {
     fontSize: 18,
-    marginTop: 3,
+    marginTop: -2,
     fontWeight: "800",
   },
   caption: {

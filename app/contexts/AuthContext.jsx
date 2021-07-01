@@ -7,7 +7,8 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     async function getcrd() {
       try {
-        const jwt_auth = await SecureStore.getItemAsync("jwt_auth");
+        const jwt_authString = await SecureStore.getItemAsync("jwt_auth");
+        const jwt_auth = await JSON.parse(jwt_authString);
         if (jwt_auth) setAuthToken(jwt_auth);
       } catch (error) {
         console.log("Error while fetching jwt_auth from secureStore", error);

@@ -12,11 +12,21 @@ import colors from "res/colors";
 import { init, IMLocalized } from "config/IMLocalized";
 import { registerUser } from "services/auth.service";
 import * as SecureStore from "expo-secure-store";
+import { storage } from '../firebase';
+
 
 import Toast from "react-native-toast-message";
 import { login } from "../services/auth.service";
 
 export const RegisterScreen = ({ navigation,route }) => {
+  let gender = null;
+  let profilePicture = null;
+  let nationality=null;
+  if (route && route.params) {
+    if (route.params.gender){ gender = route.params.gender;}
+    if (route.params.profilePicture){ profilePicture = route.params.profilePicture;}
+    if (route.params.selectedCountryCode){ nationality = route.params.selectedCountryCode;}
+  }
   init();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -28,6 +38,7 @@ export const RegisterScreen = ({ navigation,route }) => {
   const [hidePassword, sethidePassword] = React.useState(true);
   const [passwordError, setPasswordError] = useState([]);
   const [enabledKB, setenabledKB] = useState(false);
+  const [profilePictureUrl,setProfilePictureUrl]=React.useState(null);
   const [errors, setErrors] = useState({
     firstName: "",
     lastName: "",
@@ -75,10 +86,50 @@ export const RegisterScreen = ({ navigation,route }) => {
     setErrors("");
     setPasswordError("");
   };
+  const uploadSinglePicture = async (picture) => {
+    if (picture) {
+      var now = new Date();
+      const res = await fetch(picture.uri);
+      const blob = await res.blob();
+      const uploadTask = storage
+        .ref(`profilePhotos/${lastName}_${now.getTime()}`)
+        .put(blob);
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          const progress = Math.round(
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+          );
+          console.log("image progress " + progress);
+        },
+        (error) => {
+          console.log("err", error);
+          setIsLoading(false);
+          Toast.show({
+            type: "error",
+            position: "bottom",
+            text2: "",
+            text1: IMLocalized("invalidRegisteringMessage"),
+            visibilityTime: 3000,
+            autoHide: true,
+            bottomOffset: 40,
+          });        },
+        () => {
+          storage
+            .ref("profilePhotos")
+            .child(`${lastName}_${now.getTime()}`)
+            .getDownloadURL()
+            .then((url) => {
+              console.log("image url", url);
+              setProfilePictureUrl(url);
+              sendDataToDb(url);
+            });
+        }
+      );
+    }
+  };
   const signUpButtonPressed = async () => {
     setIsLoading(true);
-    //check field
-    //post the data
     if (
       email.length === 0 &&
       password.length === 0 &&
@@ -96,39 +147,44 @@ export const RegisterScreen = ({ navigation,route }) => {
         bottomOffset: 40,
       });
     } else {
-      let gender=route.params.gender;
-      registerUser(firstName.trim(), lastName.trim(), email, password,gender)
-        .then(({ data }) => {
-          setIsLoading(false);
-          Toast.show({
-            type: "success",
-            position: "bottom",
-            text2: "",
-            text1: IMLocalized("validRegisteringMessage"),
-            visibilityTime: 4000,
-            autoHide: true,
-            bottomOffset: 40,
-          });
-        }).then(()=>{
-            navigation.navigate("LoginScreen",{email});
-            //cleardata();
-        })
-        .catch((err) => {
-          console.log("err", err);
-          setIsLoading(false);
-          Toast.show({
-            type: "error",
-            position: "bottom",
-            text2: "",
-            text1: IMLocalized("invalidRegisteringMessage"),
-            visibilityTime: 3000,
-            autoHide: true,
-            bottomOffset: 40,
-          });
-        });
+       uploadSinglePicture(profilePicture);
     }
   };
-
+  const sendDataToDb=(vprofilePictureUrl)=>{
+    if(vprofilePictureUrl!==null){
+      console.log("profilePictureUrl",vprofilePictureUrl);
+      registerUser(firstName.trim(), lastName.trim(), email, password,gender,nationality,vprofilePictureUrl)
+      .then(({ data }) => {
+        console.log("tousrist data",data);
+        setIsLoading(false);
+        Toast.show({
+          type: "success",
+          position: "bottom",
+          text2: "",
+          text1: IMLocalized("validRegisteringMessage"),
+          visibilityTime: 4000,
+          autoHide: true,
+          bottomOffset: 40,
+        });
+      }).then(()=>{
+          navigation.navigate("LoginScreen",{email});
+          //cleardata();
+      })
+      .catch((err) => {
+        console.log("err", err);
+        setIsLoading(false);
+        Toast.show({
+          type: "error",
+          position: "bottom",
+          text2: "",
+          text1: IMLocalized("invalidRegisteringMessage"),
+          visibilityTime: 3000,
+          autoHide: true,
+          bottomOffset: 40,
+        });
+      });
+    }
+   }
   const theme = {
     colors: {
       placeholder: colors.placeholderTextColor,
@@ -209,6 +265,7 @@ export const RegisterScreen = ({ navigation,route }) => {
                 outlineColor={colors.inputOutlineColor}
                 theme={theme}
                 textContentType="emailAddress"
+                keyboardType={"email-address"}
                 onChangeText={(text) => handleEmailChange(text)}
                 onSubmitEditing={() => focusOnElement(passwordRef)}
                 left={

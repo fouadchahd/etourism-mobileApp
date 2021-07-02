@@ -41,7 +41,8 @@ const colors = {
     headerBorderBottomColor:'#748c94',
     beij:"#fffff9",
     underlayColor:"#d2d7df",
-    deviderColor:"#d9d9d9"
+    deviderColor:"#d9d9d9",
+    activityIndicatorColor:"##999999"
   }
   
   export default colors;

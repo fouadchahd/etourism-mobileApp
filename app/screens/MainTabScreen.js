@@ -10,6 +10,7 @@ import { IMLocalized } from "config/IMLocalized";
 import { useContext } from "react";
 import AuthContext from "../contexts/AuthContext";
 import colors from "res/colors";
+import EditProfileRootStack from "./EditProfileRootStack";
 const Tab = createBottomTabNavigator();
 const createTabProfilItem = (focused, label, urlImage) => {
   return (
@@ -83,7 +84,7 @@ const MainTabScreen = () => {
         showLabel: false,
         style: {
           position: "absolute",
-          bottom: 25,
+          bottom: 20,
           left: 20,
           right: 20,
           backgroundColor: "white",
@@ -122,8 +123,8 @@ const MainTabScreen = () => {
         }}
       />
       <Tab.Screen
-        name="Profile"
-        component={ProfileScreen}
+        name="EditProfil"
+        component={EditProfileRootStack}
         options={{
           tabBarIcon: ({ focused }) =>
             createTabProfilItem(focused, "drawerProfilLabel", pictureUri),
@@ -137,10 +138,10 @@ export default MainTabScreen;
 
 const styles = StyleSheet.create({
   shadow: {
-    shadowColor: colors.buttonBackGroundPrimaryColor,
+    shadowColor: colors.underlayColor,
     shadowOffset: { height: 10, width: 0 },
-    shadowRadius: 3.5,
-    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    shadowOpacity: 0.5,
     elevation: 5,
   },
 });

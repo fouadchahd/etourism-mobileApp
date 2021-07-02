@@ -1,29 +1,40 @@
-import React from "react";
-import { StyleSheet, Text, View, Button, TextInput, Alert } from "react-native";
+import React, { useState, useContext, useEffect } from "react";
+import {
+  StyleSheet,
+  Text,
+  ActivityIndicator,
+  View,
+  TextInput,
+  Alert,
+} from "react-native";
 import colors from "res/colors";
 import { IMLocalized } from "config/IMLocalized";
-import { useState, useContext, useEffect } from "react";
 import AuthContext from "../../contexts/AuthContext";
 import { TouchableWithoutFeedback } from "react-native-gesture-handler";
 import { setCredentials } from "services/credentials";
+import { updateBioToDB } from "services/account.service";
 const EditBioScreen = ({ navigation, route }) => {
   let oldbio = route?.params?.bio ? route.params.bio : null;
   const [newbio, setNewbio] = useState(oldbio);
   const [hasUnsavedChanges, sethasUnsavedChanges] = useState(false);
   const [forcedToGoBack, setForcedToGoBack] = useState(false);
   const { authToken, setAuthToken } = useContext(AuthContext);
+  const [isLoading, setisLoading] = useState(false);
+
   useEffect(() => {
     if (forcedToGoBack === true) navigation.goBack();
   }, [forcedToGoBack]);
-  //let forcedToGoBack = false;
+
   const updateAuthTokenbio = async () => {
     let newInfo = authToken.data;
     newInfo.bio = newbio;
-
-    let result = await setCredentials({ ...authToken, data: newInfo });
-    if (result === true) {
+    setisLoading(true);
+    let Ok = await setCredentials({ ...authToken, data: newInfo });
+    let result = await updateBioToDB(authToken.data.id, newbio);
+    if (result.status === 200 && Ok === true) {
       setForcedToGoBack(true);
     }
+    setisLoading(false);
   };
   const handlechange = (text) => {
     setNewbio(text);
@@ -35,24 +46,34 @@ const EditBioScreen = ({ navigation, route }) => {
   };
   React.useLayoutEffect(() => {
     navigation.setOptions({
-      headerRight: () => (
-        <TouchableWithoutFeedback onPress={updateAuthTokenbio}>
-          <Text
-            style={[
-              styles.rightBtn,
-              {
-                color: hasUnsavedChanges
-                  ? colors.skyblue
-                  : colors.underlayColor,
-              },
-            ]}
-          >
-            Done
-          </Text>
-        </TouchableWithoutFeedback>
-      ),
+      headerRight: () => {
+        return (
+          <TouchableWithoutFeedback onPress={updateAuthTokenbio}>
+            {isLoading ? (
+              <ActivityIndicator
+                color="##999999"
+                marginRight={20}
+                size="small"
+              />
+            ) : (
+              <Text
+                style={[
+                  styles.rightBtn,
+                  {
+                    color: hasUnsavedChanges
+                      ? colors.skyblue
+                      : colors.underlayColor,
+                  },
+                ]}
+              >
+                Done
+              </Text>
+            )}
+          </TouchableWithoutFeedback>
+        );
+      },
     });
-  }, [navigation, newbio, hasUnsavedChanges]);
+  }, [navigation, newbio, isLoading, hasUnsavedChanges]);
   React.useEffect(
     () =>
       navigation.addListener("beforeRemove", (e) => {
@@ -91,15 +112,15 @@ const EditBioScreen = ({ navigation, route }) => {
       </Text>
       <TextInput
         value={newbio}
-        returnKeyType={"done"}
+        multiline
         onSubmitEditing={() =>
           console.log("submited", Boolean(hasUnsavedChanges))
         }
         onChangeText={handlechange}
-        numberOfLines={1}
-        maxLength={255}
+        numberOfLines={5}
+        maxLength={200}
         style={{
-          height: 40,
+          minHeight: 40,
           borderBottomWidth: 0.5,
           borderBottomColor: "gray",
           color: colors.facebookColor,

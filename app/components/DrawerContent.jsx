@@ -1,5 +1,5 @@
 import React from "react";
-import { View, StyleSheet, Text, Dimensions, Image } from "react-native";
+import { View, StyleSheet, Image } from "react-native";
 import { Avatar, Title, Caption, Paragraph, Drawer } from "react-native-paper";
 import { DrawerContentScrollView, DrawerItem } from "@react-navigation/drawer";
 import Icon from "react-native-vector-icons/Ionicons";
@@ -68,7 +68,7 @@ export default function DrawerContent(props) {
             <View style={styles.row}>
               <View style={styles.section}>
                 <Caption style={styles.caption}>
-                  {IMLocalized("defaultBio")}
+                  {userInfo?.bio ? userInfo.bio : IMLocalized("defaultBio")}
                 </Caption>
               </View>
             </View>
@@ -97,7 +97,9 @@ export default function DrawerContent(props) {
                 )}
                 label={IMLocalized("drawerEditProfileLabel")}
                 onPress={() => {
-                  props.navigation.navigate("EditProfile");
+                  props.navigation.navigate("MainTabScreen", {
+                    screen: "EditProfil",
+                  });
                 }}
               />
 

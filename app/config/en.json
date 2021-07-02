@@ -9,6 +9,7 @@
     "bigLorem":"Vestibulum ultricies tempus augue ardum,Nunc vehicula ,vehicula tellus at nunc dignissim dapibus. Quisque sem leo, mollis a placerat sit amet, tempor ac quam. Aliquam eu feugiat nisi, id tincidunt justo..",
     "noAccountText":"Didn't have any account yet? ",
 "alreadyHaveAccount":"Already have an account ?",
+"pseudoAleadyUser":"🚫 Sorry this username is already used by another user",
 "signInHere":" Sign-in here",
     "signUpHere":" Sign-up here ",
     "signInButtonText":"Sign-in",
@@ -31,13 +32,14 @@
 ,"signInButtonLoaderText":"Authentication..."
 ,"signUpButtonLoaderText":"Registering..."
 ,"invalidCredentialsMessage":"Invalid Credentials, Retry again"
-,"invalidRegisteringMessage":"Sorry, something went wrong"
+,"invalidRegisteringMessage":"Something went wrong"
 ,"validRegisteringMessage":"Good news, you have create your account "
 ,"validRegisteringSubMessage":"Sign-in to enjoy the moroccan culture🇲🇦 "
 ,"fillAllFieldErrorMessage":"Fill Out All Fields "
 ,"genderMale":"Male"
 ,"genderFemale":"Female"
 ,"continue":"Continue",
+"done":"Save",
 "drawerEditProfileLabel":"Edit profile",
 "drawerSettingsLabel":"Settings",
 "drawerExploreLabel":"Explore",

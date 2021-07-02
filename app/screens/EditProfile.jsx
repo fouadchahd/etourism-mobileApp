@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import {
   Dimensions,
   ScrollView,
@@ -10,7 +10,6 @@ import {
 import colors from "res/colors";
 import { IMLocalized } from "config/IMLocalized";
 import Constants from "expo-constants";
-import { useState } from "react";
 import AuthContext from "../contexts/AuthContext";
 import countries from "res/countries";
 import { deleteCredentials } from "services/credentials";
@@ -19,8 +18,9 @@ import {
   TouchableWithoutFeedback,
 } from "react-native-gesture-handler";
 import Icon from "react-native-vector-icons/MaterialIcons";
+
 import IconFontAwesome from "react-native-vector-icons/FontAwesome";
-import { useFocusEffect, useIsFocused } from "@react-navigation/native";
+import { useIsFocused } from "@react-navigation/native";
 
 const getCountryName = (code) => {
   let matchedCountry = countries.filter((country) => country.code === code);
@@ -33,42 +33,15 @@ const EditProfile = ({ navigation, route }) => {
   const [somethingChanged, setSomethingChanged] = useState(false);
   const isFocused = useIsFocused();
   React.useEffect(() => {
-    if (isFocused) {
-    }
+    console.log("EditProfileScreenIsOnFocused");
   }, [isFocused, route.params]);
 
   return (
-    <View style={styles.screen}>
-      <View style={styles.header}>
-        <View style={styles.leftView}>
-          <TouchableWithoutFeedback onPress={() => navigation.goBack()}>
-            <Text style={styles.leftText}>{IMLocalized("cancel")}</Text>
-          </TouchableWithoutFeedback>
-        </View>
-        <View style={styles.centerView}>
-          <Text
-            style={styles.centerText}
-            numberOfLines={1}
-            ellipsizeMode="tail"
-          >
-            {IMLocalized("drawerEditProfileLabel")}
-          </Text>
-        </View>
-        <View style={styles.rightView}>
-          <Text
-            style={[
-              styles.rightText,
-              somethingChanged ? {} : { color: colors.softGray, opacity: 0.4 },
-            ]}
-          >
-            {IMLocalized("save")}
-          </Text>
-        </View>
-      </View>
+    <View style={[styles.screen, { backgroundColor: "white" }]}>
       <ScrollView
         horizontal={false}
-        bounces={false}
-        style={{ backgroundColor: "white" }}
+        bounces={true}
+        style={{ backgroundColor: "white", marginBottom: 100 }}
       >
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
@@ -120,6 +93,8 @@ const EditProfile = ({ navigation, route }) => {
               onPress={() =>
                 navigation.navigate("EditPseudoScreen", {
                   pseudo: authInfo.pseudo,
+                  firstName: authInfo.firstName,
+                  lastName: authInfo.lastName,
                 })
               }
             >
@@ -239,6 +214,7 @@ const EditProfile = ({ navigation, route }) => {
               onPress={() =>
                 navigation.navigate("EditNationalityScreen", {
                   nationality: authInfo.nationality,
+                  countryName: getCountryName(authInfo.nationality),
                 })
               }
             >

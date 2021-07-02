@@ -1,30 +1,39 @@
-import React from "react";
-import { StyleSheet, Text, View, Button, TextInput, Alert } from "react-native";
-import palettes from "res/palettes";
+import React, { useState, useContext, useEffect } from "react";
+import {
+  StyleSheet,
+  Text,
+  View,
+  ActivityIndicator,
+  TextInput,
+  Alert,
+} from "react-native";
 import colors from "res/colors";
 import { IMLocalized } from "config/IMLocalized";
-import { useState, useContext, useEffect } from "react";
+
 import AuthContext from "../../contexts/AuthContext";
 import { TouchableWithoutFeedback } from "react-native-gesture-handler";
 import { setCredentials } from "services/credentials";
+import { updateFirstnameToDB } from "services/account.service";
 const EditFirstnameScreen = ({ navigation, route }) => {
   let oldFirstname = route?.params?.firstName ? route.params.firstName : null;
   const [newFirstName, setNewFirstName] = useState(oldFirstname);
   const [hasUnsavedChanges, sethasUnsavedChanges] = useState(false);
   const [forcedToGoBack, setForcedToGoBack] = useState(false);
+  const [isLoading, setisLoading] = useState(false);
   const { authToken, setAuthToken } = useContext(AuthContext);
   useEffect(() => {
     if (forcedToGoBack === true) navigation.goBack();
   }, [forcedToGoBack]);
-  //let forcedToGoBack = false;
   const updateAuthTokenFirstname = async () => {
     let newInfo = authToken.data;
     newInfo.firstName = newFirstName;
-
-    let result = await setCredentials({ ...authToken, data: newInfo });
-    if (result === true) {
+    setisLoading(true);
+    let Ok = await setCredentials({ ...authToken, data: newInfo });
+    let result = await updateFirstnameToDB(authToken.data.id, newFirstName);
+    if (result.status === 200 && Ok === true) {
       setForcedToGoBack(true);
     }
+    setisLoading(false);
   };
   const handlechange = (text) => {
     setNewFirstName(text);
@@ -36,24 +45,34 @@ const EditFirstnameScreen = ({ navigation, route }) => {
   };
   React.useLayoutEffect(() => {
     navigation.setOptions({
-      headerRight: () => (
-        <TouchableWithoutFeedback onPress={updateAuthTokenFirstname}>
-          <Text
-            style={[
-              styles.rightBtn,
-              {
-                color: hasUnsavedChanges
-                  ? colors.skyblue
-                  : colors.underlayColor,
-              },
-            ]}
-          >
-            Done
-          </Text>
-        </TouchableWithoutFeedback>
-      ),
+      headerRight: () => {
+        return (
+          <TouchableWithoutFeedback onPress={updateAuthTokenFirstname}>
+            {isLoading ? (
+              <ActivityIndicator
+                color="##999999"
+                marginRight={20}
+                size="small"
+              />
+            ) : (
+              <Text
+                style={[
+                  styles.rightBtn,
+                  {
+                    color: hasUnsavedChanges
+                      ? colors.skyblue
+                      : colors.underlayColor,
+                  },
+                ]}
+              >
+                Done
+              </Text>
+            )}
+          </TouchableWithoutFeedback>
+        );
+      },
     });
-  }, [navigation, newFirstName, hasUnsavedChanges]);
+  }, [navigation, newFirstName, isLoading, hasUnsavedChanges]);
   React.useEffect(
     () =>
       navigation.addListener("beforeRemove", (e) => {
@@ -78,7 +97,6 @@ const EditFirstnameScreen = ({ navigation, route }) => {
               // If the user confirmed, then we dispatch the action we blocked earlier
               // This will continue the action that had triggered the removal of the screen
               onPress: () => navigation.dispatch(e.data.action),
-              //              onPress: () => navigation.navigate("EditProfileScreen"),
             },
           ]
         );
@@ -91,6 +109,7 @@ const EditFirstnameScreen = ({ navigation, route }) => {
         {IMLocalized("newValue")} :
       </Text>
       <TextInput
+        selectionColor={colors.softBlue}
         value={newFirstName}
         enablesReturnKeyAutomatically
         returnKeyType={"done"}
@@ -120,6 +139,6 @@ const styles = StyleSheet.create({
   rightBtn: {
     fontSize: 17,
     fontWeight: "600",
-    marginRight: 10,
+    marginRight: 18,
   },
 });

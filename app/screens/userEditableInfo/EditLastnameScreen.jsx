@@ -1,30 +1,42 @@
-import React from "react";
-import { StyleSheet, Text, View, Button, TextInput, Alert } from "react-native";
+import React, { useState, useContext, useEffect } from "react";
+import {
+  StyleSheet,
+  Text,
+  View,
+  ActivityIndicator,
+  TextInput,
+  Alert,
+} from "react-native";
 import colors from "res/colors";
 import { IMLocalized } from "config/IMLocalized";
-import { useState, useContext, useEffect } from "react";
 import AuthContext from "../../contexts/AuthContext";
 import { TouchableWithoutFeedback } from "react-native-gesture-handler";
 import { setCredentials } from "services/credentials";
+import { updateLastnameToDB } from "services/account.service";
 const EditLastnameScreen = ({ navigation, route }) => {
   let oldLastname = route?.params?.lastName ? route.params.lastName : null;
   const [newLastName, setNewLastName] = useState(oldLastname);
   const [hasUnsavedChanges, sethasUnsavedChanges] = useState(false);
   const [forcedToGoBack, setForcedToGoBack] = useState(false);
   const { authToken, setAuthToken } = useContext(AuthContext);
+  const [isLoading, setisLoading] = useState(false);
+
   useEffect(() => {
     if (forcedToGoBack === true) navigation.goBack();
   }, [forcedToGoBack]);
-  //let forcedToGoBack = false;
+
   const updateAuthTokenLastname = async () => {
     let newInfo = authToken.data;
     newInfo.lastName = newLastName;
-
-    let result = await setCredentials({ ...authToken, data: newInfo });
-    if (result === true) {
+    setisLoading(true);
+    let Ok = await setCredentials({ ...authToken, data: newInfo });
+    let result = await updateLastnameToDB(authToken.data.id, newLastName);
+    if (result.status === 200 && Ok === true) {
       setForcedToGoBack(true);
     }
+    setisLoading(false);
   };
+
   const handlechange = (text) => {
     setNewLastName(text);
     if (text !== oldLastname && text.length > 0) {
@@ -35,24 +47,34 @@ const EditLastnameScreen = ({ navigation, route }) => {
   };
   React.useLayoutEffect(() => {
     navigation.setOptions({
-      headerRight: () => (
-        <TouchableWithoutFeedback onPress={updateAuthTokenLastname}>
-          <Text
-            style={[
-              styles.rightBtn,
-              {
-                color: hasUnsavedChanges
-                  ? colors.skyblue
-                  : colors.underlayColor,
-              },
-            ]}
-          >
-            Done
-          </Text>
-        </TouchableWithoutFeedback>
-      ),
+      headerRight: () => {
+        return (
+          <TouchableWithoutFeedback onPress={updateAuthTokenLastname}>
+            {isLoading ? (
+              <ActivityIndicator
+                color={colors.ActivityIndicatorColor}
+                marginRight={20}
+                size="small"
+              />
+            ) : (
+              <Text
+                style={[
+                  styles.rightBtn,
+                  {
+                    color: hasUnsavedChanges
+                      ? colors.skyblue
+                      : colors.underlayColor,
+                  },
+                ]}
+              >
+                Done
+              </Text>
+            )}
+          </TouchableWithoutFeedback>
+        );
+      },
     });
-  }, [navigation, newLastName, hasUnsavedChanges]);
+  }, [navigation, newLastName, isLoading, hasUnsavedChanges]);
   React.useEffect(
     () =>
       navigation.addListener("beforeRemove", (e) => {

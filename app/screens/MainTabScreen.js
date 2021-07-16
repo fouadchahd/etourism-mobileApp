@@ -1,16 +1,15 @@
-import React from "react";
-import { StyleSheet, View, Text, Image } from "react-native";
+import React, { useContext } from "react";
+import { StyleSheet, View, Text, Image, Platform } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import SupportScreen from "./SupportScreen";
-import ProfileScreen from "./ProfileScreen";
 import MapsScreen from "./MapsScreen";
 import HomeScreen from "./HomeScreen";
 import Icon from "react-native-vector-icons/Ionicons";
 import { IMLocalized } from "config/IMLocalized";
-import { useContext } from "react";
 import AuthContext from "../contexts/AuthContext";
 import colors from "res/colors";
 import EditProfileRootStack from "./EditProfileRootStack";
+import HomeStackScreen from "./HomeStackScreen";
 const Tab = createBottomTabNavigator();
 const createTabProfilItem = (focused, label, urlImage) => {
   return (
@@ -79,29 +78,29 @@ const MainTabScreen = () => {
     : null;
   return (
     <Tab.Navigator
-      initialRouteName="Home"
+      initialRouteName="HomeStack"
       tabBarOptions={{
         showLabel: false,
         style: {
           position: "absolute",
-          bottom: 20,
+          bottom: Platform.OS==='ios' ?29:10,
+          backgroundColor:colors.lightGreen,
           left: 20,
           right: 20,
-          backgroundColor: "white",
           elevation: 0,
-          borderRadius: 15,
+          borderRadius: 20,
           height: 70,
-          borderColor: colors.grayWhite,
-          borderWidth: 0.3,
+          borderColor: colors.inputOutlineColor2,
+          borderWidth: 0.2,
           borderTopWidth: 0.3,
-          borderTopColor: colors.grayWhite,
+          borderTopColor: colors.inputPrimaryColor,
           ...styles.shadow,
         },
       }}
     >
       <Tab.Screen
-        name="Home"
-        component={HomeScreen}
+        name="HomeStack"
+        component={HomeStackScreen}
         options={{
           tabBarIcon: ({ focused }) =>
             createTabItem(focused, "drawerHomeLabel", "ios-home"),
@@ -123,7 +122,7 @@ const MainTabScreen = () => {
         }}
       />
       <Tab.Screen
-        name="EditProfil"
+        name="EditProfilStack"
         component={EditProfileRootStack}
         options={{
           tabBarIcon: ({ focused }) =>
@@ -140,8 +139,9 @@ const styles = StyleSheet.create({
   shadow: {
     shadowColor: colors.underlayColor,
     shadowOffset: { height: 10, width: 0 },
-    shadowRadius: 5,
-    shadowOpacity: 0.5,
-    elevation: 5,
+    shadowRadius: 6,
+    shadowOpacity: 0.4,
+    elevation: 4,
+    opacity:0.8
   },
 });

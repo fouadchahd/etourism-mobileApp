@@ -1,6 +1,6 @@
 const colors = {
     title: '#00B75D',
-    white:"#FFF0FF",
+    white:"#FFFFF9",
     pureWhite:"#fff",
     green:"#337e53",
     lightGreen:"#C6EEC5",

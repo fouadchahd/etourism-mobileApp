@@ -9,6 +9,7 @@ import colors from "../res/colors";
 
 const Drawer = createDrawerNavigator();
 const RootDrawerScreen = ({ navigation }) => {
+  console.log("ROOTDRAWERSCREEN");
   return (
     <Drawer.Navigator
       drawerStyle={{

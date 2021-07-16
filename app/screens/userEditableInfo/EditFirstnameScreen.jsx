@@ -7,6 +7,8 @@ import {
   TextInput,
   Alert,
 } from "react-native";
+import Toast from "react-native-toast-message";
+
 import colors from "res/colors";
 import { IMLocalized } from "config/IMLocalized";
 
@@ -24,16 +26,35 @@ const EditFirstnameScreen = ({ navigation, route }) => {
   useEffect(() => {
     if (forcedToGoBack === true) navigation.goBack();
   }, [forcedToGoBack]);
+
   const updateAuthTokenFirstname = async () => {
     let newInfo = authToken.data;
-    newInfo.firstName = newFirstName;
     setisLoading(true);
-    let Ok = await setCredentials({ ...authToken, data: newInfo });
-    let result = await updateFirstnameToDB(authToken.data.id, newFirstName);
-    if (result.status === 200 && Ok === true) {
-      setForcedToGoBack(true);
+    let result = await updateFirstnameToDB(
+      authToken.data.id,
+      newFirstName
+    ).catch((err) => {
+      displayErrorToast();
+    });
+    if (result?.status === 200) {
+      newInfo.firstName = newFirstName;
+      let Ok = await setCredentials({ ...authToken, data: newInfo });
+      if (Ok === true) {
+        setForcedToGoBack(true);
+      }
     }
+  };
+  const displayErrorToast = () => {
     setisLoading(false);
+    Toast.show({
+      type: "error",
+      position: "bottom",
+      visibilityTime: 2000,
+      autoHide: true,
+      bottomOffset: 95,
+      text1: IMLocalized("invalidRegisteringMessage"),
+      text2: "",
+    });
   };
   const handlechange = (text) => {
     setNewFirstName(text);

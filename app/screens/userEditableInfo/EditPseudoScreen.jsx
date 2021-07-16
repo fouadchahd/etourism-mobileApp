@@ -7,6 +7,8 @@ import {
   TextInput,
   Alert,
 } from "react-native";
+import Toast from "react-native-toast-message";
+
 import colors from "res/colors";
 import { IMLocalized } from "config/IMLocalized";
 import AuthContext from "../../contexts/AuthContext";
@@ -37,12 +39,19 @@ const EditPseudoScreen = ({ navigation, route }) => {
     if (alreadyUsed) {
       setPseudoAlreadyUsed(true);
     } else {
-      let newInfo = authToken.data;
-      newInfo.pseudo = newPseudo;
-      let Ok = await setCredentials({ ...authToken, data: newInfo });
-      let result = await updatePseudoToDB(authToken.data.id, newPseudo);
-      if (result.status === 200 && Ok === true) {
-        setForcedToGoBack(true);
+      let result = await updatePseudoToDB(authToken.data.id, newPseudo).catch(
+        (err) => {
+          displayErrorToast();
+        }
+      );
+      if (result?.status === 200) {
+        let newInfo = authToken.data;
+        newInfo.pseudo = newPseudo;
+
+        let Ok = await setCredentials({ ...authToken, data: newInfo });
+        if (Ok === true) {
+          setForcedToGoBack(true);
+        }
       }
     }
     setisLoading(false);
@@ -58,6 +67,20 @@ const EditPseudoScreen = ({ navigation, route }) => {
       console.log("err", err);
     }
   };
+
+  const displayErrorToast = () => {
+    setisLoading(false);
+    Toast.show({
+      type: "error",
+      position: "bottom",
+      visibilityTime: 2000,
+      autoHide: true,
+      bottomOffset: 95,
+      text1: IMLocalized("invalidRegisteringMessage"),
+      text2: "",
+    });
+  };
+
   const handlechange = (text) => {
     setNewPseudo(text);
     if (text.toLowerCase() !== oldPseudo.toLowerCase()) {

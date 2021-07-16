@@ -32,14 +32,14 @@
 ,"signInButtonLoaderText":"Authentication..."
 ,"signUpButtonLoaderText":"Registering..."
 ,"invalidCredentialsMessage":"Invalid Credentials, Retry again"
-,"invalidRegisteringMessage":"Something went wrong"
+,"invalidRegisteringMessage":"Something Went Wrong"
 ,"validRegisteringMessage":"Good news, you have create your account "
 ,"validRegisteringSubMessage":"Sign-in to enjoy the moroccan culture🇲🇦 "
 ,"fillAllFieldErrorMessage":"Fill Out All Fields "
 ,"genderMale":"Male"
 ,"genderFemale":"Female"
 ,"continue":"Continue",
-"done":"Save",
+"done":"Done",
 "drawerEditProfileLabel":"Edit profile",
 "drawerSettingsLabel":"Settings",
 "drawerExploreLabel":"Explore",
@@ -64,6 +64,10 @@
 "newValue":"New value",
 "unchangeableField":"Sorry! ☹️ This field is unchangeable",
 "alertDiscardChangesText":"You have unsaved changes. Are you sure to discard them and leave the screen?",
-"alertDiscardChangesTitle":"Discard changes ?"
-
+"alertDiscardChangesTitle":"Discard changes ?",
+"sights":"sights",
+"hi":"Hi",
+"homeScreenWelcomeTitle":"What would you like to explore 🔎 ? ",
+"tours":"Suggested for you",
+"pois":"Recommended Spot"
 }

@@ -4,8 +4,6 @@ import { AuthProvider } from "./app/contexts/AuthContext";
 import Toast,{BaseToast} from 'react-native-toast-message';
 import {
   Provider as PaperProvider,
-  DefaultTheme as PaperDefaultTheme,
-  DarkTheme as PaperDarkTheme,
 } from "react-native-paper";
 import { Dimensions } from "react-native";
 import colors from "./app/res/colors";

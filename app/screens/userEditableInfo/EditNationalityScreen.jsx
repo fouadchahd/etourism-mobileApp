@@ -6,20 +6,24 @@ import {
   ActivityIndicator,
   View,
   Image,
+  Alert,
 } from "react-native";
+import Toast from "react-native-toast-message";
+
 import { IMLocalized } from "config/IMLocalized";
 import countries from "res/countries";
 import AuthContext from "../../contexts/AuthContext";
 import colors from "res/colors";
 import { Searchbar } from "react-native-paper";
 import { TouchableWithoutFeedback } from "react-native-gesture-handler";
-import { LinearGradient } from "expo-linear-gradient";
 import { updateNationalityToDB } from "services/account.service";
 import { setCredentials } from "services/credentials";
 
 const EditNationalityScreen = ({ navigation, route }) => {
   const { authToken, setAuthToken } = useContext(AuthContext);
   const [isLoading, setisLoading] = useState(false);
+  const [hasUnsavedChanges, sethasUnsavedChanges] = useState(false);
+  const [forcedToGoBack, setforcedToGoBack] = useState(false);
 
   let oldNationality = route?.params?.nationality
     ? route.params.nationality
@@ -34,10 +38,54 @@ const EditNationalityScreen = ({ navigation, route }) => {
   const [selectedCountryCode, setSelectedCountryCode] =
     useState(oldNationality);
   const onChangeSearch = (query) => setQuery(query);
+
   React.useEffect(() => {
     filterWithName(query);
   }, [query]);
 
+  React.useEffect(
+    () =>
+      navigation.addListener("beforeRemove", (e) => {
+        if (!hasUnsavedChanges || (hasUnsavedChanges && forcedToGoBack)) {
+          // If we don't have unsaved changes, then we don't need to do anything
+          //forcedToGoBack means that we submited the new value before going back
+          return;
+        }
+
+        // Prevent default behavior of leaving the screen
+        e.preventDefault();
+
+        // Prompt the user before leaving the screen
+        Alert.alert(
+          IMLocalized("alertDiscardChangesTitle"),
+          IMLocalized("alertDiscardChangesText"),
+          [
+            { text: "Don't leave", style: "cancel", onPress: () => {} },
+            {
+              text: "Leave",
+              style: "destructive",
+              // If the user confirmed, then we dispatch the action we blocked earlier
+              // This will continue the action that had triggered the removal of the screen
+              onPress: () => navigation.dispatch(e.data.action),
+              //              onPress: () => navigation.navigate("EditProfileScreen"),
+            },
+          ]
+        );
+      }),
+    [navigation, forcedToGoBack, hasUnsavedChanges]
+  );
+  const displayErrorToast = () => {
+    setisLoading(false);
+    Toast.show({
+      type: "error",
+      position: "bottom",
+      visibilityTime: 2000,
+      autoHide: true,
+      bottomOffset: 95,
+      text1: IMLocalized("invalidRegisteringMessage"),
+      text2: "",
+    });
+  };
   const filterWithName = (foo) => {
     if (foo.length === 0) {
       setDisplayedCountries([...countries.slice(0, 30)]);
@@ -49,21 +97,58 @@ const EditNationalityScreen = ({ navigation, route }) => {
       setDisplayedCountries([...vDisplayedCountries]);
     }
   };
+  React.useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => {
+        return (
+          <TouchableWithoutFeedback onPress={updateAuthTokenNationality}>
+            {isLoading ? (
+              <ActivityIndicator
+                color={colors.ActivityIndicatorColor}
+                marginRight={20}
+                size="small"
+              />
+            ) : (
+              <Text
+                style={[
+                  styles.rightBtn,
+                  {
+                    color: hasUnsavedChanges
+                      ? colors.skyblue
+                      : colors.underlayColor,
+                  },
+                ]}
+              >
+                {IMLocalized("done")}
+              </Text>
+            )}
+          </TouchableWithoutFeedback>
+        );
+      },
+    });
+  }, [navigation, selectedCountryCode, isLoading, hasUnsavedChanges]);
 
   const updateAuthTokenNationality = async () => {
     let newInfo = authToken.data;
-    newInfo.nationality = selectedCountryCode;
     setisLoading(true);
-    let Ok = await setCredentials({ ...authToken, data: newInfo });
     let result = await updateNationalityToDB(
       authToken.data.id,
       selectedCountryCode
-    );
-    if (result.status === 200 && Ok === true) {
-      navigation.goBack();
+    ).catch((err) => {
+      displayErrorToast();
+    });
+    if (result?.status === 200) {
+      newInfo.nationality = selectedCountryCode;
+      let Ok = await setCredentials({ ...authToken, data: newInfo });
+      if (Ok === true) {
+        setforcedToGoBack(true);
+      }
     }
     setisLoading(false);
   };
+  React.useEffect(() => {
+    if (forcedToGoBack === true) navigation.goBack();
+  }, [forcedToGoBack]);
   return (
     <View style={[{ flex: 1 }]} bounces={false}>
       <View style={styles.header}></View>
@@ -91,6 +176,7 @@ const EditNationalityScreen = ({ navigation, route }) => {
                 key={index}
                 onPress={() => {
                   setSelectedCountryCode(country.code);
+                  sethasUnsavedChanges(true);
                 }}
               >
                 <View
@@ -116,56 +202,6 @@ const EditNationalityScreen = ({ navigation, route }) => {
             );
           })}
       </ScrollView>
-      {selectedCountryCode !== oldNationality && (
-        <View
-          style={{
-            width: "90%",
-            alignSelf: "center",
-            position: "absolute",
-            bottom: 100,
-          }}
-        >
-          <TouchableWithoutFeedback onPress={updateAuthTokenNationality}>
-            <LinearGradient
-              style={{
-                height: 60,
-                borderRadius: 5,
-                justifyContent: "center",
-                alignItems: "center",
-                flexDirection: "row",
-                shadowOpacity: 0.5,
-                shadowRadius: 10,
-                shadowOffset: {
-                  height: 15,
-                  width: 15,
-                },
-              }}
-              colors={["#edf2f4", "#e5e5e5"]}
-              end={[0, 0]}
-              start={[0, 1]}
-            >
-              {isLoading ? (
-                <ActivityIndicator color={colors.ActivityIndicatorColor} />
-              ) : (
-                <>
-                  <Text style={[styles.textButton, { color: "#212529" }]}>
-                    {IMLocalized("done")}
-                  </Text>
-                  <Image
-                    style={styles.smallFlagIcon}
-                    source={{
-                      uri:
-                        "https://www.countryflags.io/" +
-                        selectedCountryCode +
-                        "/flat/64.png",
-                    }}
-                  ></Image>
-                </>
-              )}
-            </LinearGradient>
-          </TouchableWithoutFeedback>
-        </View>
-      )}
     </View>
   );
 };
@@ -235,5 +271,10 @@ const styles = StyleSheet.create({
     resizeMode: "stretch",
     borderRadius: 0,
     alignSelf: "center",
+  },
+  rightBtn: {
+    fontSize: 17,
+    fontWeight: "600",
+    marginRight: 15,
   },
 });

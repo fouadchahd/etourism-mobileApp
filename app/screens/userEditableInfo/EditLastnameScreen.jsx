@@ -7,6 +7,8 @@ import {
   TextInput,
   Alert,
 } from "react-native";
+import Toast from "react-native-toast-message";
+
 import colors from "res/colors";
 import { IMLocalized } from "config/IMLocalized";
 import AuthContext from "../../contexts/AuthContext";
@@ -16,10 +18,10 @@ import { updateLastnameToDB } from "services/account.service";
 const EditLastnameScreen = ({ navigation, route }) => {
   let oldLastname = route?.params?.lastName ? route.params.lastName : null;
   const [newLastName, setNewLastName] = useState(oldLastname);
-  const [hasUnsavedChanges, sethasUnsavedChanges] = useState(false);
   const [forcedToGoBack, setForcedToGoBack] = useState(false);
   const { authToken, setAuthToken } = useContext(AuthContext);
   const [isLoading, setisLoading] = useState(false);
+  const [hasUnsavedChanges, sethasUnsavedChanges] = useState(false);
 
   useEffect(() => {
     if (forcedToGoBack === true) navigation.goBack();
@@ -27,16 +29,33 @@ const EditLastnameScreen = ({ navigation, route }) => {
 
   const updateAuthTokenLastname = async () => {
     let newInfo = authToken.data;
-    newInfo.lastName = newLastName;
     setisLoading(true);
-    let Ok = await setCredentials({ ...authToken, data: newInfo });
-    let result = await updateLastnameToDB(authToken.data.id, newLastName);
-    if (result.status === 200 && Ok === true) {
-      setForcedToGoBack(true);
+    let result = await updateLastnameToDB(authToken.data.id, newLastName).catch(
+      (err) => {
+        displayErrorToast();
+      }
+    );
+    if (result?.status === 200) {
+      let Ok = await setCredentials({ ...authToken, data: newInfo });
+      if (Ok === true) {
+        newInfo.lastName = newLastName;
+        setForcedToGoBack(true);
+      }
     }
     setisLoading(false);
   };
-
+  const displayErrorToast = () => {
+    setisLoading(false);
+    Toast.show({
+      type: "error",
+      position: "bottom",
+      visibilityTime: 2000,
+      autoHide: true,
+      bottomOffset: 95,
+      text1: IMLocalized("invalidRegisteringMessage"),
+      text2: "",
+    });
+  };
   const handlechange = (text) => {
     setNewLastName(text);
     if (text !== oldLastname && text.length > 0) {

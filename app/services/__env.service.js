@@ -8,4 +8,8 @@ export default {
         'Content-Type': 'application/json',
         'Accept': 'application/json'
     },
+    "PATCH_HEADER":{
+        'Content-Type': 'application/merge-patch+json',
+        'Accept': 'application/json'
+    }
 }

@@ -7,6 +7,8 @@ import {
   TextInput,
   Alert,
 } from "react-native";
+import Toast from "react-native-toast-message";
+
 import colors from "res/colors";
 import { IMLocalized } from "config/IMLocalized";
 import AuthContext from "../../contexts/AuthContext";
@@ -27,14 +29,30 @@ const EditBioScreen = ({ navigation, route }) => {
 
   const updateAuthTokenbio = async () => {
     let newInfo = authToken.data;
-    newInfo.bio = newbio;
     setisLoading(true);
-    let Ok = await setCredentials({ ...authToken, data: newInfo });
-    let result = await updateBioToDB(authToken.data.id, newbio);
-    if (result.status === 200 && Ok === true) {
-      setForcedToGoBack(true);
+    let result = await updateBioToDB(authToken.data.id, newbio).catch((err) => {
+      displayErrorToast();
+    });
+    if (result?.status === 200) {
+      let Ok = await setCredentials({ ...authToken, data: newInfo });
+      if (Ok === true) {
+        setForcedToGoBack(true);
+        newInfo.bio = newbio;
+      }
     }
     setisLoading(false);
+  };
+  const displayErrorToast = () => {
+    setisLoading(false);
+    Toast.show({
+      type: "error",
+      position: "bottom",
+      visibilityTime: 2000,
+      autoHide: true,
+      bottomOffset: 95,
+      text1: IMLocalized("invalidRegisteringMessage"),
+      text2: "",
+    });
   };
   const handlechange = (text) => {
     setNewbio(text);

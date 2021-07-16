@@ -65,13 +65,15 @@ export default function DrawerContent(props) {
               </View>
             </View>
 
-            <View style={styles.row}>
-              <View style={styles.section}>
-                <Caption style={styles.caption}>
-                  {userInfo?.bio ? userInfo.bio : IMLocalized("defaultBio")}
-                </Caption>
+            {false && (
+              <View style={styles.row}>
+                <View style={styles.section}>
+                  <Caption style={styles.caption}>
+                    {userInfo?.bio ? userInfo.bio : IMLocalized("defaultBio")}
+                  </Caption>
+                </View>
               </View>
-            </View>
+            )}
           </LinearGradient>
           <DrawerContentScrollView
             backgroundColor={colors.grayWhite}
@@ -84,7 +86,7 @@ export default function DrawerContent(props) {
                 )}
                 label={IMLocalized("drawerHomeLabel")}
                 onPress={() => {
-                  props.navigation.navigate("Home");
+                  props.navigation.navigate("HomeStack");
                 }}
               />
               <DrawerItem
@@ -98,7 +100,7 @@ export default function DrawerContent(props) {
                 label={IMLocalized("drawerEditProfileLabel")}
                 onPress={() => {
                   props.navigation.navigate("MainTabScreen", {
-                    screen: "EditProfil",
+                    screen: "EditProfilStack",
                   });
                 }}
               />

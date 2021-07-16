@@ -10,13 +10,12 @@ import {
 import EditProfile from "./EditProfile";
 import { IMLocalized } from "config/IMLocalized";
 import { createStackNavigator } from "@react-navigation/stack";
-
 import HeaderEditProfil from "../components/HeaderEditProfil";
 const EditProfileStack = createStackNavigator();
 
 const EditProfileRootStack = ({ navigation }) => {
   return (
-    <EditProfileStack.Navigator>
+    <EditProfileStack.Navigator initialRouteName="EditProfileScreen">
       <EditProfileStack.Screen
         options={{
           title: IMLocalized("drawerEditProfileLabel"),

@@ -42,25 +42,30 @@ export const getCredentials = async () => {
 }
 
 function isTokenExpired (token) {
-var decoded = jwt_decode(token)
-return (decoded.exp < Date.now() / 1000);
+try {
+  console.log('token',token);
+  var decoded = jwt_decode(token);
+  return (decoded.exp < Date.now() / 1000);
+} 
+catch (error) {  
+  return false;
+} 
 }
 
 async function getVerifiedKeys (keys) {
 console.log('Loading keys from secureStore')
 if (keys) {
     console.log('checking access')
-
     if (!isTokenExpired(keys.token)) {
     console.log('returning access')
     return keys
     } else {
     console.log('access expired')
-
     console.log('checking refresh expiry')
     if (!isTokenExpired(keys.refreshToken)) {
         console.log('fetching access using refresh')
         const newtoken =  getAccessUsingRefresh(keys.refreshToken);
+        console.log("test passed");
         const new_jwt_auth={refreshToken:keys.refreshToken,token:newtoken,data:keys.data};
         await AsyncStorage.setItemAsync('jwt_auth', JSON.stringify(new_jwt_auth));
         console.log('JWT_AUTH UPDATED on SECURESTORE');
@@ -68,6 +73,7 @@ if (keys) {
         return new_jwt_auth;
     } else {
         console.log('refresh expired, please login')
+        await SecureStore.deleteItemAsync("jwt_auth");
         return null
     }
     }
@@ -77,7 +83,10 @@ if (keys) {
     return null
 }
 }
+async function isRefreshTokenExpired(refershToken){
+  var newToken= getAccessUsingRefresh(refershToken);
 
+}
 
 async function getAccessUsingRefresh (refreshToken) {
 return axios.post(API_URL+"token/refresh",{"refreshToken":refreshToken}).then(({data})=>data.token)

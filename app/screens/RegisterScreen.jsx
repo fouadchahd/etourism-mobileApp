@@ -17,8 +17,14 @@ import { storage } from '../firebase';
 
 import Toast from "react-native-toast-message";
 import { login } from "../services/auth.service";
-
 export const RegisterScreen = ({ navigation,route }) => {
+/*React.useEffect( ()=>{
+  async function clearStorage(){
+      const ok =await SecureStore.deleteItemAsync("jwt_auth");
+      console.log('registerScreen state',ok)
+  }clearStorage();
+} 
+);*/
   let gender = null;
   let profilePicture = null;
   let nationality=null;

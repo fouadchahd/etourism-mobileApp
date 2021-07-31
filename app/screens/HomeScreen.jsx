@@ -92,7 +92,7 @@ const HomeScreen = ({ navigation }) => {
   const PoiData = [
     {
       id: "7",
-      name: "for test",
+      name: "Hassan",
       createdAt: "2021-06-05T15:27:17+00:00",
       updatedAt: null,
       description: [
@@ -114,6 +114,10 @@ const HomeScreen = ({ navigation }) => {
         },
       ],
       photo: [
+        {
+          url: "https://images.unsplash.com/photo-1598022124758-26d09adcb7b6?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=750&q=80",
+          alt: "hassan.jpg",
+        },
         {
           url: "https://firebasestorage.googleapis.com/v0/b/etourism-256e3.appspot.com/o/poiPhotos%2F1622906820258_lemellah.jpg?alt=media&token=7417f0d8-bb70-47c0-801d-b370fa8df749",
           alt: "lemellah.jpg",
@@ -139,7 +143,7 @@ const HomeScreen = ({ navigation }) => {
     },
     {
       id: "8",
-      name: "for test",
+      name: "Bab ROua7",
       createdAt: "2021-06-05T15:27:17+00:00",
       updatedAt: null,
       description: [
@@ -153,7 +157,7 @@ const HomeScreen = ({ navigation }) => {
       ],
       audio: [
         {
-          url: "https://firebasestorage.googleapis.com/v0/b/etourism-256e3.appspot.com/o/poiAudios%2F%23fran%C3%A7ais_1622906829088_Tinder_notificacion_sound_effect.mp3?alt=media&token=597f7c52-2506-4569-8a46-7cd074bd8b64",
+          url: "https://www.audioguias-bluehertz.es/audioguide_paris/eng/Paris_01_EN.mp3",
           language: {
             name: "français",
             languageCode: "fr",
@@ -501,7 +505,9 @@ const HomeScreen = ({ navigation }) => {
               renderItem={({ item, index }) => {
                 return (
                   <TouchableOpacity
-                    onPress={() => navigation.navigate("PoiDetailScreen", item)}
+                    onPress={() =>
+                      navigation.navigate("PoiDetailScreen", { item })
+                    }
                     style={styles.poiItemContainer}
                   >
                     <Image
@@ -631,6 +637,7 @@ const styles = StyleSheet.create({
   },
   poiNameText: {
     fontSize: 20,
+    fontWeight: "bold",
     textTransform: "uppercase",
   },
   bottomView: { paddingHorizontal: 15, paddingVertical: 15 },

@@ -69,5 +69,12 @@
 "hi":"Hi",
 "homeScreenWelcomeTitle":"What would you like to explore 🔎 ? ",
 "tours":"Suggested for you",
-"pois":"Recommended Spot"
+"pois":"Recommended Spot",
+"maps":"Maps",
+"directions":"Directions",
+"readMore":"Read more",
+"readLess":"Read less",
+"photos":"Photos",
+"nophotos":"NO PHOTO FOUND",
+"seeAll":"See all"
 }

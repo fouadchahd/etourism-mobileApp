@@ -3,6 +3,7 @@ import {createSharedElementStackNavigator} from 'react-navigation-shared-element
 import PoiDetailScreen from './PoiDetailScreen';
 import TourDetailScreen from './TourDetailScreen';
 import HomeScreen from './HomeScreen';
+import DisplayPhotosScreen from './DisplayPhotosScreen';
 
 const Stack=createSharedElementStackNavigator();
 const HomeStackScreen = () => {
@@ -12,6 +13,7 @@ const HomeStackScreen = () => {
            <Stack.Screen  name="HomeScreen" component={HomeScreen}></Stack.Screen>
            <Stack.Screen  name="PoiDetailScreen" component={PoiDetailScreen}></Stack.Screen>
            <Stack.Screen  name="TourDetailScreen" component={TourDetailScreen}></Stack.Screen>
+           <Stack.Screen  name="DisplayPhotosScreen" component={DisplayPhotosScreen}></Stack.Screen>
        </Stack.Navigator>
     )
 }

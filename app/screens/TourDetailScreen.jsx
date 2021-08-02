@@ -28,13 +28,13 @@ const PoiDetailScreen = ({ navigation, route }) => {
           style={styles.background}
         >
           <Icon
-            size={40}
+            size={30}
             name="chevron-back-outline"
             onPress={navigation.goBack}
             style={{
-              borderRadius: 20,
-              backgroundColor: colors.deviderColor,
-              width: 42,
+              borderRadius: 16,
+              backgroundColor: colors.white,
+              width: 32,
               overflow: "hidden",
               marginLeft: 15,
             }}

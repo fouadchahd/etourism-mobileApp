@@ -5,6 +5,7 @@ import { I18nManager } from 'react-native';
 
 export const translationGetters = {
   'en-MA': () => require('./en.json'),
+  'en': () => require('./en.json'),
   'fr-MA': () => require('./fr.json'),
   'ar-MA': ()=>  require('./ar.json'),
 };

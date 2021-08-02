@@ -16,6 +16,7 @@ import { IMLocalized } from "config/IMLocalized";
 import colors from "res/colors";
 import Constants from "expo-constants";
 import { SharedElement } from "react-navigation-shared-element";
+import { getAllPois } from "../services/pois.service";
 const ITEM_WIDTH = Dimensions.get("window").width * 0.6;
 const ITEM_HEIGHT = ITEM_WIDTH * 1.6;
 const SPACING = 12;
@@ -28,6 +29,7 @@ const VERTICAL_FULL_SIZE = ITEM_HEIGHT + VERTICAL_SPACING * 2;
 const HomeScreen = ({ navigation }) => {
   console.log("HOMESCREEN");
   const [lastScrollY, setLastScrollY] = React.useState(0);
+  const [PoiData, setPoiData] = React.useState([]);
   const handleScrollView = (event) => {
     //   console.log("old ScrollY=", lastScrollY);
     // console.log("new ScrollY=", event.nativeEvent.contentOffset.y);
@@ -89,7 +91,7 @@ const HomeScreen = ({ navigation }) => {
       numberOfSights: 1 + Math.floor(Math.random() * 10),
     },
   ];
-  const PoiData = [
+  /*const PoiData = [
     {
       id: "7",
       name: "Hassan",
@@ -376,167 +378,184 @@ const HomeScreen = ({ navigation }) => {
         },
       },
     },
-  ];
+  ];*/
   const scrollX = React.useRef(new Animated.Value(0)).current;
-
-  return (
-    <View style={styles.container}>
-      <View
-        style={{
-          height: 50,
-          width: "100%",
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <Icon
-          onPress={() => navigation.openDrawer()}
-          size={38}
-          name="menu"
-          style={styles.leftIcons}
-        />
-        <View style={styles.rightView}>
-          <Text style={styles.cityNameText}>Rabat</Text>
-          <Icon size={20} name="chevron-down"></Icon>
-        </View>
-      </View>
-      <ScrollView onScroll={handleScrollView} scrollEventThrottle={16}>
-        <View style={styles.welcomeTitleContainer}>
-          <Text style={styles.welcomeTitle} numberOfLines={2}>
-            {IMLocalized("homeScreenWelcomeTitle")}
-          </Text>
-        </View>
-        <View style={styles.flatListHeader}>
-          <Text style={styles.flatListHeaderTitle} numberOfLines={2}>
-            {IMLocalized("tours")}
-          </Text>
-        </View>
-        <Animated.FlatList
-          onScroll={Animated.event(
-            [
-              {
-                nativeEvent: { contentOffset: { x: scrollX } },
-              },
-            ],
-            { useNativeDriver: true }
-          )}
-          style={{ backgroundColor: "white" }}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          snapToInterval={FULL_SIZE}
-          data={data}
-          keyExtractor={(item) => item.id}
-          decelerationRate={"fast"}
-          renderItem={({ item, index }) => {
-            const inputRange = [
-              (index - 1) * FULL_SIZE,
-              index * FULL_SIZE,
-              (index + 1) * FULL_SIZE,
-            ];
-            const translateX = scrollX.interpolate({
-              inputRange,
-              outputRange: [ITEM_WIDTH, 0, -ITEM_WIDTH],
-            });
-            const scale = scrollX.interpolate({
-              inputRange,
-              outputRange: [1, 1.2, 1],
-            });
-            return (
-              <TouchableOpacity
-                style={styles.itemContainer}
-                onPress={() => {
-                  navigation.push("TourDetailScreen", { item });
-                }}
-              >
-                <SharedElement
-                  id={`item.${item.id}.cover`}
-                  style={[StyleSheet.absoluteFillObject]}
-                >
-                  <View
-                    style={[
-                      StyleSheet.absoluteFillObject,
-                      { overflow: "hidden", borderRadius: RADIUS },
-                    ]}
-                  >
-                    <Animated.Image
-                      source={{ uri: item.cover }}
-                      style={[
-                        { ...StyleSheet.absoluteFillObject },
-                        {
-                          backgroundColor: colors.underlayColor,
-                          resizeMode: "cover",
-                        },
-                        { transform: [{ scale }] },
-                      ]}
-                    ></Animated.Image>
-                  </View>
-                </SharedElement>
-
-                <Animated.Text
-                  numberOfLines={2}
-                  style={[
-                    styles.location,
-                    index + 1 === data.length
-                      ? {}
-                      : { transform: [{ translateX }] },
-                  ]}
-                >
-                  {item.name}
-                </Animated.Text>
-                <View style={styles.numberContainer}>
-                  <Text style={styles.number}>{item.numberOfSights}</Text>
-                  <Text style={styles.itemLabel}>{IMLocalized("sights")}</Text>
-                </View>
-              </TouchableOpacity>
-            );
+  const [isLoading, setisLoading] = React.useState(false);
+  React.useEffect(async () => {
+    const fetching = async () => {
+      setisLoading(true);
+      await getAllPois().then(({ data }) => {
+        console.log("data,", data);
+        setPoiData(data);
+      });
+      setisLoading(false);
+    };
+    fetching();
+  }, []);
+  if (isLoading) {
+    return <View style={styles.container}></View>;
+  } else {
+    return (
+      <View style={styles.container}>
+        <View
+          style={{
+            height: 50,
+            width: "100%",
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
           }}
-        />
-        <View style={styles.poisContainer}>
-          <Text style={styles.flatListHeaderTitle} numberOfLines={2}>
-            {IMLocalized("pois")}
-          </Text>
-          <View style={styles.flatListContainer}>
-            <FlatList
-              data={PoiData}
-              keyExtractor={(item) => item.id}
-              decelerationRate={"fast"}
-              showsVerticalScrollIndicator={false}
-              renderItem={({ item, index }) => {
-                return (
-                  <TouchableOpacity
-                    onPress={() =>
-                      navigation.navigate("PoiDetailScreen", { item })
-                    }
-                    style={styles.poiItemContainer}
-                  >
-                    <Image
-                      style={styles.poiImage}
-                      resizeMode="cover"
-                      source={{ uri: item.photo[0].url }}
-                    ></Image>
-                    <View style={styles.bottomView}>
-                      <Text style={styles.poiNameText}>{item.name}📍</Text>
-                      <Text style={styles.poiDescText} numberOfLines={2}>
-                        {
-                          IMLocalized("bigLorem") //item.description[0].content
-                        }
-                      </Text>
-                    </View>
-                    <View style={styles.stickerView}>
-                      <Text style={styles.stickerText}>
-                        {item.typeOfAttraction.type}
-                      </Text>
-                    </View>
-                  </TouchableOpacity>
-                );
-              }}
-            ></FlatList>
+        >
+          <Icon
+            onPress={() => navigation.openDrawer()}
+            size={38}
+            name="menu"
+            style={styles.leftIcons}
+          />
+          <View style={styles.rightView}>
+            <Text style={styles.cityNameText}>Rabat</Text>
+            <Icon size={20} name="chevron-down"></Icon>
           </View>
         </View>
-      </ScrollView>
-    </View>
-  );
+        <ScrollView onScroll={handleScrollView} scrollEventThrottle={16}>
+          <View style={styles.welcomeTitleContainer}>
+            <Text style={styles.welcomeTitle} numberOfLines={2}>
+              {IMLocalized("homeScreenWelcomeTitle")}
+            </Text>
+          </View>
+          <View style={styles.flatListHeader}>
+            <Text style={styles.flatListHeaderTitle} numberOfLines={2}>
+              {IMLocalized("tours")}
+            </Text>
+          </View>
+          <Animated.FlatList
+            onScroll={Animated.event(
+              [
+                {
+                  nativeEvent: { contentOffset: { x: scrollX } },
+                },
+              ],
+              { useNativeDriver: true }
+            )}
+            style={{ backgroundColor: "white" }}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            snapToInterval={FULL_SIZE}
+            data={data}
+            keyExtractor={(item) => item.id.toString()}
+            decelerationRate={"fast"}
+            renderItem={({ item, index }) => {
+              const inputRange = [
+                (index - 1) * FULL_SIZE,
+                index * FULL_SIZE,
+                (index + 1) * FULL_SIZE,
+              ];
+              const translateX = scrollX.interpolate({
+                inputRange,
+                outputRange: [ITEM_WIDTH, 0, -ITEM_WIDTH],
+              });
+              const scale = scrollX.interpolate({
+                inputRange,
+                outputRange: [1, 1.2, 1],
+              });
+              return (
+                <TouchableOpacity
+                  style={styles.itemContainer}
+                  onPress={() => {
+                    navigation.push("TourDetailScreen", { item });
+                  }}
+                >
+                  <SharedElement
+                    id={`item.${item.id}.cover`}
+                    style={[StyleSheet.absoluteFillObject]}
+                  >
+                    <View
+                      style={[
+                        StyleSheet.absoluteFillObject,
+                        { overflow: "hidden", borderRadius: RADIUS },
+                      ]}
+                    >
+                      <Animated.Image
+                        source={{ uri: item.cover }}
+                        style={[
+                          { ...StyleSheet.absoluteFillObject },
+                          {
+                            backgroundColor: colors.underlayColor,
+                            resizeMode: "cover",
+                          },
+                          { transform: [{ scale }] },
+                        ]}
+                      ></Animated.Image>
+                    </View>
+                  </SharedElement>
+
+                  <Animated.Text
+                    numberOfLines={2}
+                    style={[
+                      styles.location,
+                      index + 1 === data.length
+                        ? {}
+                        : { transform: [{ translateX }] },
+                    ]}
+                  >
+                    {item.name}
+                  </Animated.Text>
+                  <View style={styles.numberContainer}>
+                    <Text style={styles.number}>{item.numberOfSights}</Text>
+                    <Text style={styles.itemLabel}>
+                      {IMLocalized("sights")}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              );
+            }}
+          />
+          <View style={styles.poisContainer}>
+            <Text style={styles.flatListHeaderTitle} numberOfLines={2}>
+              {IMLocalized("pois")}
+            </Text>
+            <View style={styles.flatListContainer}>
+              <FlatList
+                data={PoiData}
+                keyExtractor={(item) => item.id.toString()}
+                decelerationRate={"fast"}
+                showsVerticalScrollIndicator={false}
+                renderItem={({ item, index }) => {
+                  return (
+                    <TouchableOpacity
+                      onPress={() =>
+                        navigation.navigate("PoiDetailScreen", { item })
+                      }
+                      style={styles.poiItemContainer}
+                    >
+                      <Image
+                        style={styles.poiImage}
+                        resizeMode="cover"
+                        source={{ uri: item?.photo[0]?.url }}
+                      ></Image>
+                      <View style={styles.bottomView}>
+                        <Text style={styles.poiNameText}>{item.name}📍</Text>
+                        <Text style={styles.poiDescText} numberOfLines={2}>
+                          {
+                            item.description[0]?.content //item.description[0].content
+                          }
+                        </Text>
+                      </View>
+                      <View style={styles.stickerView}>
+                        <Text style={styles.stickerText}>
+                          {item.typeOfAttraction.type}
+                        </Text>
+                      </View>
+                    </TouchableOpacity>
+                  );
+                }}
+              ></FlatList>
+            </View>
+          </View>
+        </ScrollView>
+      </View>
+    );
+  }
 };
 
 export default HomeScreen;
